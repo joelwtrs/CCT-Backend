@@ -7,7 +7,11 @@ const fs = require("fs");
 
 const apiRoutes = require("./routes/apiRoutes");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+
+if (!fs.existsSync("./logs")) {
+  fs.mkdirSync("./logs");
+}
 
 //middleware
 app.use(helmet());
