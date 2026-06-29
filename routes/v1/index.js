@@ -16,7 +16,7 @@ router.use("/users", usersRoutes);
 router.use("/clients", clientsRoutes);
 router.use("/audits", auditRoutes);
 router.use("/reports", reportRoutes);
-router.use("/track", trackRoutes);
+router.use("/tracks", trackRoutes);
 
 router.get("/", (req, res) => {
   res.sendStatus(403);
