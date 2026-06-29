@@ -1,19 +1,24 @@
 const express = require("express");
 const db = require("../../db");
-const { authMiddleware } = require("../../middleware/auth");
+const { authMiddleware, adminOnly } = require("../../middleware/auth");
 
 const router = express.Router();
 router.use(authMiddleware);
 
 // GET /api/audits — overzicht
 router.get("/", async (req, res) => {
-  const [rows] = await db.query(`
+  let query = `
     SELECT a.*, c.name AS client_name, u.name AS created_by_name
     FROM audits a
     JOIN clients c ON c.id = a.client_id
     JOIN users   u ON u.id = a.created_by
     ORDER BY a.updated_at DESC
-  `);
+  `;
+  //set limit in query
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
+  if (limit && limit > 0) query += " LIMIT " + limit;
+  //run and return
+  const [rows] = await db.query(query);
   res.json(rows);
 });
 
@@ -291,11 +296,7 @@ router.put("/:id/devices", async (req, res) => {
 });
 
 // DELETE /api/audits/:id
-router.delete("/:id", async (req, res) => {
-  if (req.user.role !== "admin")
-    return res
-      .status(403)
-      .json({ error: "Enkel admins kunnen audits verwijderen." });
+router.delete("/:id", adminOnly, async (req, res) => {
   await db.query("DELETE FROM audits WHERE id = ?", [req.params.id]);
   res.json({ message: "Audit verwijderd." });
 });

@@ -44,6 +44,23 @@ CREATE TABLE IF NOT EXISTS audits (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
+-- Tracks
+CREATE TABLE IF NOT EXISTS tracks (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  client_id     INT NOT NULL,
+  user_id       INT NOT NULL,
+  contact_type  VARCHAR(30) NOT NULL,
+  contact_date  DATE NOT NULL,
+  start_time    TIME NOT NULL,
+  end_time      TIME,
+  question      TEXT NOT NULL,
+  feedback      TEXT,
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+);
+
 -- Algemene checklist antwoorden (per audit)
 CREATE TABLE IF NOT EXISTS audit_general_checks (
   id         INT AUTO_INCREMENT PRIMARY KEY,
