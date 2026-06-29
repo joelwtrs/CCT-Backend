@@ -7,13 +7,13 @@ router.use(authMiddleware);
 
 // GET /api/clients
 router.get("/", async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM clients ORDER BY name");
+  const [rows] = await db.query("SELECT * FROM clients WHERE active = 1 ORDER BY name");
   res.json(rows);
 });
 
 // GET /api/clients/:id
 router.get("/:id", async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM clients WHERE id = ?", [
+  const [rows] = await db.query("SELECT * FROM clients WHERE id = ? AND active = 1", [
     req.params.id,
   ]);
   if (!rows.length)
@@ -50,17 +50,10 @@ router.put("/:id", async (req, res) => {
   res.json({ message: "Klant bijgewerkt." });
 });
 
-// DELETE /api/clients/:id (admin only)
+// DELETE /api/clients/:id (admin only) — soft delete
 router.delete("/:id", adminOnly, async (req, res) => {
-  const [audits] = await db.query("SELECT id FROM audits WHERE client_id = ?", [
-    req.params.id,
-  ]);
-  if (audits.length)
-    return res
-      .status(409)
-      .json({ error: "Klant heeft nog audits. Verwijder deze eerst." });
-  await db.query("DELETE FROM clients WHERE id = ?", [req.params.id]);
-  res.json({ message: "Klant verwijderd." });
+  await db.query("UPDATE clients SET active = 0 WHERE id = ?", [req.params.id]);
+  res.json({ ok: true });
 });
 
 module.exports = router;

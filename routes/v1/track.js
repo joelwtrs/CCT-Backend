@@ -63,4 +63,21 @@ router.post("/", async (req, res) => {
   res.status(201).json({ id: result.insertId });
 });
 
+router.put("/:id", async (req, res) => {
+  const { contactType, date, startTime, endTime, question, feedback } = req.body;
+  if (!contactType || !date || !startTime || !question)
+    return res.status(400).json({ error: "Verplichte velden niet ingevuld" });
+
+  await db.query(
+    "UPDATE tracks SET contact_type=?, contact_date=?, start_time=?, end_time=?, question=?, feedback=? WHERE id=?",
+    [contactType, date, startTime, endTime || null, question, feedback || null, req.params.id],
+  );
+  res.json({ ok: true });
+});
+
+router.delete("/:id", async (req, res) => {
+  await db.query("DELETE FROM tracks WHERE id = ?", [req.params.id]);
+  res.json({ ok: true });
+});
+
 module.exports = router;

@@ -25,8 +25,12 @@ CREATE TABLE IF NOT EXISTS clients (
   email       VARCHAR(150),
   phone       VARCHAR(50),
   address     TEXT,
+  active      TINYINT(1) NOT NULL DEFAULT 1,
   created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Migratie bestaande installaties:
+-- ALTER TABLE clients ADD COLUMN active TINYINT(1) NOT NULL DEFAULT 1;
 
 -- Audits
 CREATE TABLE IF NOT EXISTS audits (
